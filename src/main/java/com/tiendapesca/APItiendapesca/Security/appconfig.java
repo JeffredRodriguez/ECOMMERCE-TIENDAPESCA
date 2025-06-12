@@ -16,4 +16,9 @@ public class appconfig {
     public static String getDbPassword() {
         return dotenv.get("DB_PASSWORD");
     }
+    
+    
+    public static String getTokenPassword() {
+        return dotenv.get("SECRET_KEYY");
+    }
 }

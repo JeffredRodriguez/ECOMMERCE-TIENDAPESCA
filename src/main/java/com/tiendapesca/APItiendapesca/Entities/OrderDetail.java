@@ -28,15 +28,25 @@ public class OrderDetail {
     @Column(name = "subtotal", precision = 10, scale = 2, nullable = false)
     private BigDecimal subtotal;
 
+    @Column(name = "tax", precision = 10, scale = 2)
+    private BigDecimal tax;
+
+    @Column(name = "total", precision = 10, scale = 2)
+    private BigDecimal total;
+
     // --- Constructores ---
     public OrderDetail() {}
 
-    public OrderDetail(Orders order, Product product, Integer quantity, BigDecimal unitPrice, BigDecimal subtotal) {
+    public OrderDetail(Orders order, Product product, Integer quantity, 
+                      BigDecimal unitPrice, BigDecimal subtotal, 
+                      BigDecimal tax, BigDecimal total) {
         this.order = order;
         this.product = product;
         this.quantity = quantity;
         this.unitPrice = unitPrice;
         this.subtotal = subtotal;
+        this.tax = tax;
+        this.total = total;
     }
 
     // --- Getters y Setters ---
@@ -86,5 +96,21 @@ public class OrderDetail {
 
     public void setSubtotal(BigDecimal subtotal) {
         this.subtotal = subtotal;
+    }
+
+    public BigDecimal getTax() {
+        return tax;
+    }
+
+    public void setTax(BigDecimal tax) {
+        this.tax = tax;
+    }
+
+    public BigDecimal getTotal() {
+        return total;
+    }
+
+    public void setTotal(BigDecimal total) {
+        this.total = total;
     }
 }

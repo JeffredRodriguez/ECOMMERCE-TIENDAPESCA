@@ -18,60 +18,90 @@ public class Invoice {
     @Column(name = "date", columnDefinition = "DATETIME")
     private LocalDateTime date;
 
-    @Column(name = "invoice_number", length = 50)
+    @Column(name = "invoice_number", length = 50, unique = true)
     private String invoiceNumber;
 
     @Column(name = "pdf_url", columnDefinition = "TEXT")
     private String pdfUrl;
 
-    
-    public Invoice() {}
+    // Nuevos campos para cancelación
+    @Column(name = "is_canceled", columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean isCanceled = false;
 
-    public Invoice(Orders order, LocalDateTime date, String invoiceNumber, String pdfUrl) {
-        this.order = order;
-        this.date = date;
-        this.invoiceNumber = invoiceNumber;
-        this.pdfUrl = pdfUrl;
+    @Column(name = "cancelation_date", columnDefinition = "DATETIME")
+    private LocalDateTime cancelationDate;
+
+    // Constructores, getters y setters...
+
+    public Invoice() {
     }
 
-   
-    public Integer getId() {
-        return id;
-    }
+	public Invoice(Integer id, Orders order, LocalDateTime date, String invoiceNumber, String pdfUrl,
+			Boolean isCanceled, LocalDateTime cancelationDate) {
+		super();
+		this.id = id;
+		this.order = order;
+		this.date = date;
+		this.invoiceNumber = invoiceNumber;
+		this.pdfUrl = pdfUrl;
+		this.isCanceled = isCanceled;
+		this.cancelationDate = cancelationDate;
+	}
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+	public Integer getId() {
+		return id;
+	}
 
-    public Orders getOrder() {
-        return order;
-    }
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
-    public void setOrder(Orders order) {
-        this.order = order;
-    }
+	public Orders getOrder() {
+		return order;
+	}
 
-    public LocalDateTime getDate() {
-        return date;
-    }
+	public void setOrder(Orders order) {
+		this.order = order;
+	}
 
-    public void setDate(LocalDateTime date) {
-        this.date = date;
-    }
+	public LocalDateTime getDate() {
+		return date;
+	}
 
-    public String getInvoiceNumber() {
-        return invoiceNumber;
-    }
+	public void setDate(LocalDateTime date) {
+		this.date = date;
+	}
 
-    public void setInvoiceNumber(String invoiceNumber) {
-        this.invoiceNumber = invoiceNumber;
-    }
+	public String getInvoiceNumber() {
+		return invoiceNumber;
+	}
 
-    public String getPdfUrl() {
-        return pdfUrl;
-    }
+	public void setInvoiceNumber(String invoiceNumber) {
+		this.invoiceNumber = invoiceNumber;
+	}
 
-    public void setPdfUrl(String pdfUrl) {
-        this.pdfUrl = pdfUrl;
-    }
+	public String getPdfUrl() {
+		return pdfUrl;
+	}
+
+	public void setPdfUrl(String pdfUrl) {
+		this.pdfUrl = pdfUrl;
+	}
+
+	public Boolean getIsCanceled() {
+		return isCanceled;
+	}
+
+	public void setIsCanceled(Boolean isCanceled) {
+		this.isCanceled = isCanceled;
+	}
+
+	public LocalDateTime getCancelationDate() {
+		return cancelationDate;
+	}
+
+	public void setCancelationDate(LocalDateTime cancelationDate) {
+		this.cancelationDate = cancelationDate;
+	}
 }
+	

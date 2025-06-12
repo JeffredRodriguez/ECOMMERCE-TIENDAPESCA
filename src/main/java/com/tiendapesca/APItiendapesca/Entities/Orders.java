@@ -3,6 +3,7 @@ package com.tiendapesca.APItiendapesca.Entities;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "orders")
@@ -12,23 +13,23 @@ public class Orders {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "user_id")
     private Users user;
 
-    @Column(name = "date", columnDefinition = "DATETIME")
+    @Column(name = "date", nullable = false)
     private LocalDateTime date;
 
     @Column(name = "shipping_address", columnDefinition = "TEXT")
     private String shippingAddress;
 
-    @Column(name = "phone", length = 20)
+    @Column(length = 20)
     private String phone;
 
     @Column(name = "total_without_tax", precision = 10, scale = 2)
     private BigDecimal totalWithoutTax;
 
-    @Column(name = "tax", precision = 10, scale = 2)
+    @Column(precision = 10, scale = 2)
     private BigDecimal tax;
 
     @Column(name = "final_total", precision = 10, scale = 2)
@@ -38,19 +39,16 @@ public class Orders {
     @Column(name = "payment_method")
     private PaymentMethod paymentMethod;
 
-    // --- Constructores ---
-    public Orders() {}
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private OrderStatus status = OrderStatus.PROCESSING;
 
-    public Orders(Users user, LocalDateTime date, String shippingAddress, String phone,
-                  BigDecimal totalWithoutTax, BigDecimal tax, BigDecimal finalTotal, PaymentMethod paymentMethod) {
-        this.user = user;
-        this.date = date;
-        this.shippingAddress = shippingAddress;
-        this.phone = phone;
-        this.totalWithoutTax = totalWithoutTax;
-        this.tax = tax;
-        this.finalTotal = finalTotal;
-        this.paymentMethod = paymentMethod;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<OrderDetail> orderDetails;
+
+    // Constructor vacío
+    public Orders() {
+        this.date = LocalDateTime.now();
     }
 
     // --- Getters y Setters ---
@@ -124,5 +122,21 @@ public class Orders {
 
     public void setPaymentMethod(PaymentMethod paymentMethod) {
         this.paymentMethod = paymentMethod;
+    }
+
+    public OrderStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(OrderStatus status) {
+        this.status = status;
+    }
+
+    public List<OrderDetail> getOrderDetails() {
+        return orderDetails;
+    }
+
+    public void setOrderDetails(List<OrderDetail> orderDetails) {
+        this.orderDetails = orderDetails;
     }
 }

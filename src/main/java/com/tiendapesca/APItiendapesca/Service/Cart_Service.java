@@ -16,6 +16,8 @@ import com.tiendapesca.APItiendapesca.Repository.Cart_Repository;
 import com.tiendapesca.APItiendapesca.Repository.Product_Repository;
 import com.tiendapesca.APItiendapesca.Repository.Users_Repository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class Cart_Service {
 
@@ -32,95 +34,149 @@ public class Cart_Service {
         this.userRepository = userRepository;
     }
 
+    /**
+     * Agrega un producto al carrito o actualiza la cantidad si ya existe
+     */
     public void addProductToCart(Users user, AddToCartRequestDTO request) {
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuario no autenticado");
-        }
-
-        Product product = productRepository.findById(request.getProductId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Producto no encontrado"));
-
-        if (product.getStock() < request.getQuantity()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No hay suficiente stock para este producto");
-        }
-
+        validateUserAndRequest(user, request);
+        
+        Product product = getProductById(request.getProductId());
+        validateStock(product, request.getQuantity());
+        
         Optional<Cart> existingCartItem = cartRepository.findByUserAndProduct(user, product);
 
         if (existingCartItem.isPresent()) {
-            Cart cartItem = existingCartItem.get();
-            cartItem.setQuantity(cartItem.getQuantity() + request.getQuantity());
-            cartRepository.save(cartItem);
+            updateExistingCartItem(existingCartItem.get(), request.getQuantity(), product);
         } else {
-            Cart newCartItem = new Cart();
-            newCartItem.setUser(user);
-            newCartItem.setProduct(product);
-            newCartItem.setQuantity(request.getQuantity());
-            cartRepository.save(newCartItem);
+            createNewCartItem(user, product, request.getQuantity());
         }
     }
 
-    
-    //Valida que el usuario exista
+    /**
+     * Obtiene todos los items del carrito para un usuario
+     */
     public List<CartItemRespoDTO> getCartItems(Integer userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado");
-        }
-        
+        validateUserExists(userId);
         return cartRepository.findCartItemsByUserId(userId);
     }
 
-    
-    //Actualiza el carrito
+    /**
+     * Actualiza la cantidad de un item específico en el carrito
+     */
     public void updateCartItemQuantity(Users user, Integer cartItemId, Integer quantity) {
-        Cart cartItem = cartRepository.findById(cartItemId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item del carrito no encontrado"));
-
-        if (!cartItem.getUser().getId().equals(user.getId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para modificar este item del carrito");
-        }
-
+        Cart cartItem = getCartItemById(cartItemId);
+        validateUserOwnership(user, cartItem);
+        
         if (quantity <= 0) {
             cartRepository.delete(cartItem);
         } else {
-            Product product = cartItem.getProduct();
-            if (product.getStock() < quantity) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No hay suficiente stock para este producto");
-            }
-            cartItem.setQuantity(quantity);
-            cartRepository.save(cartItem);
+            updateItemQuantity(cartItem, quantity);
         }
     }
 
-    
-     //borra el carrito
+    /**
+     * Elimina un item específico del carrito
+     */
     public void removeCartItem(Users user, Integer cartItemId) {
-        Cart cartItem = cartRepository.findById(cartItemId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item del carrito no encontrado"));
-
-        if (!cartItem.getUser().getId().equals(user.getId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para eliminar este item del carrito");
-        }
-
+        Cart cartItem = getCartItemById(cartItemId);
+        validateUserOwnership(user, cartItem);
         cartRepository.delete(cartItem);
     }
 
+    /**
+     * Vacía todo el carrito de un usuario
+     */
+    @Transactional  // <-- Añade esta anotación
     public void clearCart(Users user) {
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuario no autenticado");
         }
-        
         cartRepository.deleteByUser(user);
     }
+    
 
-    // Método para calcular el total del carrito 
+    /**
+     * Calcula el total del carrito sumando todos los items
+     */
     public BigDecimal calculateCartTotal(Users user) {
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuario no autenticado");
-        }
-        
+        validateUser(user);
         return cartRepository.findCartItemsByUserId(user.getId())
                 .stream()
                 .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    // Métodos auxiliares privados para mejor organización
+    
+    private void validateUserAndRequest(Users user, AddToCartRequestDTO request) {
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuario no autenticado");
+        }
+        if (request.getQuantity() <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La cantidad debe ser mayor a cero");
+        }
+    }
+
+    private Product getProductById(Integer productId) {
+        return productRepository.findById(productId)
+                .orElseThrow(() -> new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Producto no encontrado"));
+    }
+
+    private void validateStock(Product product, int quantity) {
+        if (product.getStock() < quantity) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST, 
+                String.format("No hay suficiente stock para %s. Stock disponible: %d", 
+                    product.getName(), product.getStock()));
+        }
+    }
+
+    private void updateExistingCartItem(Cart cartItem, int additionalQuantity, Product product) {
+        int newQuantity = cartItem.getQuantity() + additionalQuantity;
+        validateStock(product, newQuantity);
+        cartItem.setQuantity(newQuantity);
+        cartRepository.save(cartItem);
+    }
+
+    private void createNewCartItem(Users user, Product product, int quantity) {
+        Cart newCartItem = new Cart();
+        newCartItem.setUser(user);
+        newCartItem.setProduct(product);
+        newCartItem.setQuantity(quantity);
+        cartRepository.save(newCartItem);
+    }
+
+    private void validateUserExists(Integer userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado");
+        }
+    }
+
+    private Cart getCartItemById(Integer cartItemId) {
+        return cartRepository.findById(cartItemId)
+                .orElseThrow(() -> new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Item del carrito no encontrado"));
+    }
+
+    private void validateUserOwnership(Users user, Cart cartItem) {
+        if (!cartItem.getUser().getId().equals(user.getId())) {
+            throw new ResponseStatusException(
+                HttpStatus.FORBIDDEN, 
+                "No tienes permiso para modificar este item del carrito");
+        }
+    }
+
+    private void validateUser(Users user) {
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuario no autenticado");
+        }
+    }
+
+    private void updateItemQuantity(Cart cartItem, int quantity) {
+        Product product = cartItem.getProduct();
+        validateStock(product, quantity);
+        cartItem.setQuantity(quantity);
+        cartRepository.save(cartItem);
     }
 }
