@@ -7,43 +7,45 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 public class OrderRequestDTO {
-	 
 
-	 @NotBlank(message = "La dirección de envío es requerida")
-	    private String shippingAddress;
-	    
-	    @NotBlank(message = "El teléfono es requerido")
-	    @Pattern(regexp = "^[0-9]{8,20}$", message = "El teléfono debe contener solo números y tener entre 8 y 20 dígitos")
-	    private String phone;
-	    
-	    @NotNull(message = "El método de pago es requerido")
-	    private PaymentMethod paymentMethod;
+    // No puede ser nulo ni vacío ni espacios
+    @NotBlank(message = "La dirección de envío es requerida")
+    private String shippingAddress;
 
-	    // Getters y Setters
-	    public String getShippingAddress() {
-	        return shippingAddress;
-	    }
+    // No puede ser nulo ni vacío y debe cumplir el patrón de números
+    @NotBlank(message = "El teléfono es requerido")
+    @Pattern(
+        regexp = "^[0-9]{8,20}$",
+        message = "El teléfono debe contener solo números y tener entre 8 y 20 dígitos"
+    )
+    private String phone;
 
-	    public void setShippingAddress(String shippingAddress) {
-	        this.shippingAddress = shippingAddress;
-	    }
+    // No puede ser nulo
+    @NotNull(message = "El método de pago es requerido")
+    private PaymentMethod paymentMethod;
 
-	    public String getPhone() {
-	        return phone;
-	    }
+    // Getters y Setters
+    public String getShippingAddress() {
+        return shippingAddress;
+    }
 
-	    public void setPhone(String phone) {
-	        this.phone = phone;
-	    }
+    public void setShippingAddress(String shippingAddress) {
+        this.shippingAddress = shippingAddress;
+    }
 
-	    public PaymentMethod getPaymentMethod() {
-	        return paymentMethod;
-	    }
+    public String getPhone() {
+        return phone;
+    }
 
-	    public void setPaymentMethod(PaymentMethod paymentMethod) {
-	        this.paymentMethod = paymentMethod;
-	    }
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 
-	    
-	    
+    public PaymentMethod getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(PaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
 }

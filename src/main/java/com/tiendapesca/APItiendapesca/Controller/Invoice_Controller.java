@@ -22,7 +22,8 @@ public class Invoice_Controller {
     public Invoice_Controller(Invoice_Service invoiceService) {
         this.invoiceService = invoiceService;
     }
-
+    
+    //Crea orden
     @PostMapping("/generate/{orderId}")
     public ResponseEntity<?> generateInvoice(@PathVariable Integer orderId) {
         try {
@@ -34,6 +35,8 @@ public class Invoice_Controller {
         }
     }
 
+    
+    //Consulta orden por ID
     @GetMapping("/order/{orderId}")
     public ResponseEntity<?> getInvoiceByOrder(@PathVariable Integer orderId) {
         try {
@@ -48,6 +51,7 @@ public class Invoice_Controller {
         }
     }
 
+     //Consulta PDF por ID  de orden
     @GetMapping("/{orderId}/pdf")
     public ResponseEntity<?> getInvoicePdf(@PathVariable Integer orderId) {
         try {
@@ -67,6 +71,7 @@ public class Invoice_Controller {
         }
     }
 
+    //Envía PDF al correo del cliente (PENDIENTE)
     @PostMapping("/{orderId}/send")
     public ResponseEntity<?> sendInvoiceByEmail(
             @PathVariable Integer orderId,
@@ -82,6 +87,7 @@ public class Invoice_Controller {
         }
     }
 
+    //Actualiza estado de la Factura a cancelada
     @PutMapping("/{orderId}/cancel")
     public ResponseEntity<?> cancelInvoice(@PathVariable Integer orderId) {
         try {
@@ -93,6 +99,7 @@ public class Invoice_Controller {
         }
     }
 
+    //Consulta detalles de orden
     @GetMapping("/{orderId}/details")
     public ResponseEntity<?> getInvoiceDetails(@PathVariable Integer orderId) {
         try {

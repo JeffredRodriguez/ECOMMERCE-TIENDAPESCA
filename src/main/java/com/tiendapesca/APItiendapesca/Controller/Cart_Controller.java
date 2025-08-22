@@ -27,6 +27,7 @@ public class Cart_Controller {
         this.cartService = cartService;
     }
 
+    //Agrega Productos al carrito de compras
     @PostMapping("/add")
     public ResponseEntity<Void> addToCart(@AuthenticationPrincipal Users user,
                                         @Valid @RequestBody AddToCartRequestDTO request) {
@@ -34,16 +35,19 @@ public class Cart_Controller {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @GetMapping
+    //Consulta datos del carrito de compras
+    @GetMapping("/get")
     public ResponseEntity<List<CartItemRespoDTO>> getCart(@AuthenticationPrincipal Users user) {
         return ResponseEntity.ok(cartService.getCartItems(user.getId()));
     }
     
+    //Calcula total del pedido
     @GetMapping("/total")
     public ResponseEntity<BigDecimal> getCartTotal(@AuthenticationPrincipal Users user) {
         return ResponseEntity.ok(cartService.calculateCartTotal(user));
     }
-    
+  
+  //Actualiza items del carrito de compras
     @PutMapping("/items/{cartItemId}")
     public ResponseEntity<Void> updateCartItem(@AuthenticationPrincipal Users user,
                                             @PathVariable Integer cartItemId,
@@ -52,6 +56,7 @@ public class Cart_Controller {
         return ResponseEntity.noContent().build();
     }
     
+ //Elimina items del carrito de compras
     @DeleteMapping("/items/{cartItemId}")
     public ResponseEntity<Void> removeCartItem(@AuthenticationPrincipal Users user,
                                             @PathVariable Integer cartItemId) {
@@ -59,7 +64,7 @@ public class Cart_Controller {
         return ResponseEntity.noContent().build();
     }
 
- // Endpoint modificado para limpiar todo el carrito
+ // Endpoint para limpiar todo el carrito de compras
     @DeleteMapping("/clear")
     public ResponseEntity<Void> clearCart(@AuthenticationPrincipal Users user) {
         cartService.clearCart(user);

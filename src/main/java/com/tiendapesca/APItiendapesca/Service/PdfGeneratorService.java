@@ -195,7 +195,9 @@ public class PdfGeneratorService {
         document.add(terms);
     }
     
-    // Métodos auxiliares...
+    
+    
+    // Métodos auxiliares...Vista del PDF
     private void addInfoRow(PdfPTable table, String label, String value, Font labelFont) {
         PdfPCell labelCell = new PdfPCell(new Phrase(label, labelFont));
         labelCell.setBorder(Rectangle.NO_BORDER);
