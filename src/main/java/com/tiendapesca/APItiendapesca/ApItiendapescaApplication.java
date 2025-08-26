@@ -12,9 +12,6 @@ public class ApItiendapescaApplication {
 	public static void main(String[] args) {
 	
 	{
-	System.setProperty("spring.datasource.url", appconfig.getDbUrl());
-    System.setProperty("spring.datasource.username", appconfig.getDbUsername());
-    System.setProperty("spring.datasource.password", appconfig.getDbPassword());
 
     SpringApplication.run(ApItiendapescaApplication.class, args);
 }
