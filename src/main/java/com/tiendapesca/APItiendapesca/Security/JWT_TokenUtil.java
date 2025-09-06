@@ -2,27 +2,23 @@ package com.tiendapesca.APItiendapesca.Security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+
 import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function; 
+import java.util.function.Function;
 
-@Component 
+@Component
 public class JWT_TokenUtil {
 
     private final SecretKey SECRET_KEY;
     private final long EXPIRATION_TIME = 1000 * 60 * 60 * 10; // 10 horas
 
-    public JWT_TokenUtil(@Value("${jwt.secret}") String secretKey) {
-        if (secretKey == null || secretKey.trim().isEmpty()) {
-            throw new IllegalArgumentException("La clave secreta JWT no puede estar vacía");
-        }
-        this.SECRET_KEY = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+    public JWT_TokenUtil(SecretKey secretKey) {
+        this.SECRET_KEY = secretKey;
     }
     
     public String generateToken(String username) {

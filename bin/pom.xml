@@ -62,7 +62,6 @@
     <artifactId>spring-boot-starter-mail</artifactId>
 </dependency>
 
-
 <!-- Para manejo de archivos -->
 <dependency>
     <groupId>commons-io</groupId>
