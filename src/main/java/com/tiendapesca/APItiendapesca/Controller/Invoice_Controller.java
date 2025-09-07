@@ -12,18 +12,30 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
+/**
+ * Controlador REST para gestionar operaciones relacionadas con facturas
+ * Proporciona endpoints para generar, consultar y gestionar facturas
+ */
 @RestController
 @RequestMapping("/api/invoices")
 public class Invoice_Controller {
 
     private final Invoice_Service invoiceService;
 
+    /**
+     * Constructor para inyección de dependencias del servicio de facturas
+     * @param invoiceService Servicio para operaciones de facturación
+     */
     @Autowired
     public Invoice_Controller(Invoice_Service invoiceService) {
         this.invoiceService = invoiceService;
     }
     
-    //Crea orden
+    /**
+     * Genera una factura para una orden específica
+     * @param orderId ID de la orden para la cual generar la factura
+     * @return ResponseEntity con la factura generada o mensaje de error
+     */
     @PostMapping("/generate/{orderId}")
     public ResponseEntity<?> generateInvoice(@PathVariable Integer orderId) {
         try {
@@ -35,8 +47,11 @@ public class Invoice_Controller {
         }
     }
 
-    
-    //Consulta orden por ID
+    /**
+     * Obtiene la factura asociada a una orden específica
+     * @param orderId ID de la orden a consultar
+     * @return ResponseEntity con los datos de la factura o mensaje de error
+     */
     @GetMapping("/order/{orderId}")
     public ResponseEntity<?> getInvoiceByOrder(@PathVariable Integer orderId) {
         try {
@@ -51,7 +66,11 @@ public class Invoice_Controller {
         }
     }
 
-     //Consulta PDF por ID  de orden
+    /**
+     * Obtiene el archivo PDF de una factura específica
+     * @param orderId ID de la orden asociada a la factura
+     * @return ResponseEntity con el archivo PDF o mensaje de error
+     */
     @GetMapping("/{orderId}/pdf")
     public ResponseEntity<?> getInvoicePdf(@PathVariable Integer orderId) {
         try {
@@ -71,7 +90,12 @@ public class Invoice_Controller {
         }
     }
 
-    //Envía PDF al correo del cliente (PENDIENTE)
+    /**
+     * Envía la factura por correo electrónico al cliente
+     * @param orderId ID de la orden asociada a la factura
+     * @param email Dirección de correo electrónico del destinatario
+     * @return ResponseEntity con confirmación de envío o mensaje de error
+     */
     @PostMapping("/{orderId}/send")
     public ResponseEntity<?> sendInvoiceByEmail(
             @PathVariable Integer orderId,
@@ -87,7 +111,11 @@ public class Invoice_Controller {
         }
     }
 
-    //Actualiza estado de la Factura a cancelada
+    /**
+     * Cancela una factura existente
+     * @param orderId ID de la orden asociada a la factura a cancelar
+     * @return ResponseEntity con confirmación de cancelación o mensaje de error
+     */
     @PutMapping("/{orderId}/cancel")
     public ResponseEntity<?> cancelInvoice(@PathVariable Integer orderId) {
         try {
@@ -99,7 +127,11 @@ public class Invoice_Controller {
         }
     }
 
-    //Consulta detalles de orden
+    /**
+     * Obtiene los detalles completos de una factura
+     * @param orderId ID de la orden asociada a la factura
+     * @return ResponseEntity con los detalles de la factura o mensaje de error
+     */
     @GetMapping("/{orderId}/details")
     public ResponseEntity<?> getInvoiceDetails(@PathVariable Integer orderId) {
         try {

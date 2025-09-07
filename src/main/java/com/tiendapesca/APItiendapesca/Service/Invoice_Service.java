@@ -1,11 +1,9 @@
 package com.tiendapesca.APItiendapesca.Service;
 
-
 import com.tiendapesca.APItiendapesca.Dtos.InvoiceResponseDTO;
 import com.tiendapesca.APItiendapesca.Dtos.OrderDetailDTO;
 import com.tiendapesca.APItiendapesca.Entities.Invoice;
 import com.tiendapesca.APItiendapesca.Entities.Orders;
-
 import com.tiendapesca.APItiendapesca.Repository.Invoice_Repository;
 import com.tiendapesca.APItiendapesca.Repository.Orders_Repository;
 import org.slf4j.Logger;
@@ -22,6 +20,10 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Servicio para gestionar operaciones relacionadas con facturas
+ * Proporciona funcionalidades para generar, cancelar, enviar y consultar facturas
+ */
 @Service
 @Transactional
 public class Invoice_Service {
@@ -33,6 +35,13 @@ public class Invoice_Service {
     private final PdfGeneratorService pdfGeneratorService;
     private final Email_Service emailService;
 
+    /**
+     * Constructor para inyección de dependencias
+     * @param invoiceRepository Repositorio de facturas
+     * @param orderRepository Repositorio de órdenes
+     * @param pdfGeneratorService Servicio para generación de PDFs
+     * @param emailService Servicio para envío de emails
+     */
     @Autowired
     public Invoice_Service(Invoice_Repository invoiceRepository,
                            Orders_Repository orderRepository,
@@ -44,11 +53,21 @@ public class Invoice_Service {
         this.emailService = emailService;
     }
 
+    /**
+     * Genera un número único de factura
+     * @return Número de factura en formato INV-YYYY-UUID
+     */
     public String generateInvoiceNumber() {
         return "INV-" + LocalDateTime.now().getYear() + "-"
                 + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
 
+    /**
+     * Genera y guarda una factura para una orden específica
+     * @param orderId ID de la orden
+     * @return Factura generada
+     * @throws Exception Si ocurre un error durante la generación
+     */
     @Transactional
     public Invoice generateAndSaveInvoice(Integer orderId) throws Exception {
         logger.info("Generando factura para orden ID: {}", orderId);
@@ -87,6 +106,10 @@ public class Invoice_Service {
         }
     }
 
+    /**
+     * Cancela una factura existente
+     * @param orderId ID de la orden asociada a la factura
+     */
     @Transactional
     public void cancelInvoice(Integer orderId) {
         try {
@@ -108,6 +131,12 @@ public class Invoice_Service {
         }
     }
 
+    /**
+     * Envía una factura por correo electrónico
+     * @param orderId ID de la orden asociada a la factura
+     * @param emailAddress Dirección de correo del destinatario
+     * @throws Exception Si ocurre un error durante el envío
+     */
     @Transactional
     public void sendInvoiceByEmail(Integer orderId, String emailAddress) throws Exception {
         logger.info("Enviando factura por email para orden ID: {} a {}", orderId, emailAddress);
@@ -136,6 +165,11 @@ public class Invoice_Service {
         }
     }
 
+    /**
+     * Obtiene la factura asociada a una orden
+     * @param orderId ID de la orden
+     * @return Factura encontrada
+     */
     public Invoice getInvoiceForOrder(Integer orderId) {
         logger.debug("Buscando factura para orden ID: {}", orderId);
 
@@ -146,6 +180,12 @@ public class Invoice_Service {
                 });
     }
 
+    /**
+     * Obtiene el archivo PDF de una factura
+     * @param orderId ID de la orden asociada
+     * @return Bytes del archivo PDF
+     * @throws IOException Si ocurre un error al leer el archivo
+     */
     public byte[] getInvoicePdf(Integer orderId) throws IOException {
         logger.debug("Obteniendo PDF de factura para orden ID: {}", orderId);
 
@@ -153,6 +193,11 @@ public class Invoice_Service {
         return Files.readAllBytes(Paths.get(invoice.getPdfUrl()));
     }
 
+    /**
+     * Convierte una entidad Invoice a un DTO de respuesta
+     * @param invoice Factura a convertir
+     * @return DTO con la información de la factura
+     */
     public InvoiceResponseDTO convertInvoiceToResponseDTO(Invoice invoice) {
         Orders order = invoice.getOrder();
 
@@ -177,5 +222,4 @@ public class Invoice_Service {
             detailDTOs
         );
     }
-
 }

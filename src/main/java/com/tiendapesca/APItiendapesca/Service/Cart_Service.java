@@ -15,9 +15,12 @@ import com.tiendapesca.APItiendapesca.Entities.Users;
 import com.tiendapesca.APItiendapesca.Repository.Cart_Repository;
 import com.tiendapesca.APItiendapesca.Repository.Product_Repository;
 import com.tiendapesca.APItiendapesca.Repository.Users_Repository;
-
 import jakarta.transaction.Transactional;
 
+/**
+ * Servicio para gestionar operaciones del carrito de compras
+ * Proporciona funcionalidades para agregar, actualizar, eliminar y consultar items del carrito
+ */
 @Service
 public class Cart_Service {
 
@@ -25,6 +28,12 @@ public class Cart_Service {
     private final Product_Repository productRepository;
     private final Users_Repository userRepository;
 
+    /**
+     * Constructor para inyección de dependencias
+     * @param cartRepository Repositorio para operaciones de carrito
+     * @param productRepository Repositorio para operaciones de productos
+     * @param userRepository Repositorio para operaciones de usuarios
+     */
     @Autowired
     public Cart_Service(Cart_Repository cartRepository, 
                       Product_Repository productRepository,
@@ -36,6 +45,8 @@ public class Cart_Service {
 
     /**
      * Agrega un producto al carrito o actualiza la cantidad si ya existe
+     * @param user Usuario dueño del carrito
+     * @param request DTO con información del producto y cantidad
      */
     public void addProductToCart(Users user, AddToCartRequestDTO request) {
         validateUserAndRequest(user, request);
@@ -54,6 +65,8 @@ public class Cart_Service {
 
     /**
      * Obtiene todos los items del carrito para un usuario
+     * @param userId ID del usuario
+     * @return Lista de DTOs con los items del carrito
      */
     public List<CartItemRespoDTO> getCartItems(Integer userId) {
         validateUserExists(userId);
@@ -62,6 +75,9 @@ public class Cart_Service {
 
     /**
      * Actualiza la cantidad de un item específico en el carrito
+     * @param user Usuario dueño del carrito
+     * @param cartItemId ID del item del carrito
+     * @param quantity Nueva cantidad
      */
     public void updateCartItemQuantity(Users user, Integer cartItemId, Integer quantity) {
         Cart cartItem = getCartItemById(cartItemId);
@@ -76,6 +92,8 @@ public class Cart_Service {
 
     /**
      * Elimina un item específico del carrito
+     * @param user Usuario dueño del carrito
+     * @param cartItemId ID del item a eliminar
      */
     public void removeCartItem(Users user, Integer cartItemId) {
         Cart cartItem = getCartItemById(cartItemId);
@@ -85,18 +103,20 @@ public class Cart_Service {
 
     /**
      * Vacía todo el carrito de un usuario
+     * @param user Usuario dueño del carrito
      */
-    @Transactional  // <-- Añade esta anotación
+    @Transactional
     public void clearCart(Users user) {
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuario no autenticado");
         }
         cartRepository.deleteByUser(user);
     }
-    
 
     /**
      * Calcula el total del carrito sumando todos los items
+     * @param user Usuario dueño del carrito
+     * @return Total del carrito como BigDecimal
      */
     public BigDecimal calculateCartTotal(Users user) {
         validateUser(user);
@@ -106,8 +126,8 @@ public class Cart_Service {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    // Métodos auxiliares privados para mejor organización
-    
+    // Métodos auxiliares privados
+
     private void validateUserAndRequest(Users user, AddToCartRequestDTO request) {
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuario no autenticado");

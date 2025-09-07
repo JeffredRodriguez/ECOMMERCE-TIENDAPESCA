@@ -12,11 +12,18 @@ public class EnvConfig {
 
     private final ConfigurableEnvironment environment;
 
-    // Cambiar de Environment a ConfigurableEnvironment
+    /**
+     * Constructor que inyecta el entorno configurable de Spring
+     * @param environment el entorno configurable de Spring
+     */
     public EnvConfig(ConfigurableEnvironment environment) {
         this.environment = environment;
     }
 
+    /**
+     * Configura y provee una instancia de Dotenv para cargar variables desde archivo .env
+     * @return Instancia de Dotenv configurada
+     */
     @Bean
     public Dotenv dotenv() {
         return Dotenv.configure()
@@ -24,17 +31,20 @@ public class EnvConfig {
                 .load();
     }
 
+    /**
+     * Integra las variables del archivo .env con el entorno de Spring después de la construcción del bean
+     */
     @jakarta.annotation.PostConstruct
     public void init() {
         Dotenv dotenv = dotenv();
         Properties properties = new Properties();
 
-        // Cargar todas las variables del .env a las propiedades de Spring
+        // Copia todas las variables de Dotenv a Properties
         dotenv.entries().forEach(entry -> {
             properties.put(entry.getKey(), entry.getValue());
         });
 
-        // Agregar las propiedades al entorno de Spring
+        // Agrega las propiedades al entorno de Spring con prioridad
         environment.getPropertySources().addFirst(
             new PropertiesPropertySource("dotenvProperties", properties)
         );

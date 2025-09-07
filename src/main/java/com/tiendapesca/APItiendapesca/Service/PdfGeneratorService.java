@@ -16,12 +16,16 @@ import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
 import java.math.BigDecimal;
 
+/**
+ * Servicio para la generación y gestión de archivos PDF de facturas
+ * Proporciona funcionalidades para crear, guardar y formatear facturas en PDF
+ */
 @Service
 public class PdfGeneratorService {
 
     private static final Logger logger = LoggerFactory.getLogger(PdfGeneratorService.class);
     
-    // Configuración fija
+    // Configuración fija para el diseño de facturas
     private static final String INVOICE_DIRECTORY = "invoices";
     private static final String COMPANY_LOGO_PATH = "src/main/resources/static/img/logoKraken.png";
     private static final String COMPANY_NAME = "Kraken Lures";
@@ -35,6 +39,13 @@ public class PdfGeneratorService {
     private static final BaseColor SECONDARY_COLOR = new BaseColor(220, 220, 220);
     private static final BaseColor ACCENT_COLOR = new BaseColor(255, 153, 0);
     
+    /**
+     * Genera un archivo PDF para una factura específica
+     * @param invoice Factura a convertir a PDF
+     * @return Array de bytes con el contenido del PDF
+     * @throws DocumentException Si ocurre un error en la creación del documento
+     * @throws IOException Si ocurre un error de entrada/salida
+     */
     public byte[] generateInvoicePdf(Invoice invoice) throws DocumentException, IOException {
         // Configuración del documento con margen superior aumentado
         Document document = new Document(PageSize.A4, 40, 40, 120, 40); // Margen superior aumentado a 120
@@ -61,6 +72,13 @@ public class PdfGeneratorService {
         return outputStream.toByteArray();
     }
 
+    /**
+     * Guarda el archivo PDF en el sistema de archivos
+     * @param pdfBytes Contenido del PDF a guardar
+     * @param invoiceNumber Número de factura para el nombre del archivo
+     * @return Ruta del archivo guardado
+     * @throws IOException Si ocurre un error al guardar el archivo
+     */
     public String savePdfToStorage(byte[] pdfBytes, String invoiceNumber) throws IOException {
         try {
             Path directory = Paths.get(INVOICE_DIRECTORY);
@@ -81,6 +99,11 @@ public class PdfGeneratorService {
         }
     }
 
+    /**
+     * Agrega el encabezado principal de la factura
+     * @param document Documento PDF
+     * @throws DocumentException Si ocurre un error al agregar contenido
+     */
     private void addInvoiceHeader(Document document) throws DocumentException {
         Font titleFont = new Font(Font.FontFamily.HELVETICA, 24, Font.BOLD, PRIMARY_COLOR);
         Paragraph title = new Paragraph("FACTURA", titleFont);
@@ -89,6 +112,12 @@ public class PdfGeneratorService {
         document.add(title);
     }
 
+    /**
+     * Agrega la información básica de la factura
+     * @param document Documento PDF
+     * @param invoice Factura con la información
+     * @throws DocumentException Si ocurre un error al agregar contenido
+     */
     private void addInvoiceInfo(Document document, Invoice invoice) throws DocumentException {
         PdfPTable infoTable = new PdfPTable(2);
         infoTable.setWidthPercentage(100);
@@ -105,6 +134,12 @@ public class PdfGeneratorService {
         document.add(infoTable);
     }
     
+    /**
+     * Agrega la información del cliente a la factura
+     * @param document Documento PDF
+     * @param invoice Factura con la información del cliente
+     * @throws DocumentException Si ocurre un error al agregar contenido
+     */
     private void addCustomerInfo(Document document, Invoice invoice) throws DocumentException {
         PdfPTable customerTable = new PdfPTable(2);
         customerTable.setWidthPercentage(100);
@@ -127,6 +162,12 @@ public class PdfGeneratorService {
         document.add(customerTable);
     }
     
+    /**
+     * Agrega la tabla de productos a la factura
+     * @param document Documento PDF
+     * @param invoice Factura con los productos
+     * @throws DocumentException Si ocurre un error al agregar contenido
+     */
     private void addProductsTable(Document document, Invoice invoice) throws DocumentException {
         PdfPTable table = new PdfPTable(5);
         table.setWidthPercentage(100);
@@ -152,6 +193,12 @@ public class PdfGeneratorService {
         document.add(table);
     }
     
+    /**
+     * Agrega la sección de totales a la factura
+     * @param document Documento PDF
+     * @param invoice Factura con los totales
+     * @throws DocumentException Si ocurre un error al agregar contenido
+     */
     private void addTotalsSection(Document document, Invoice invoice) throws DocumentException {
         PdfPTable totalsTable = new PdfPTable(2);
         totalsTable.setWidthPercentage(50);
@@ -179,6 +226,11 @@ public class PdfGeneratorService {
         document.add(totalsTable);
     }
     
+    /**
+     * Agrega los términos y condiciones a la factura
+     * @param document Documento PDF
+     * @throws DocumentException Si ocurre un error al agregar contenido
+     */
     private void addTermsAndConditions(Document document) throws DocumentException {
         Paragraph terms = new Paragraph();
         terms.setSpacingBefore(25f);
@@ -195,9 +247,8 @@ public class PdfGeneratorService {
         document.add(terms);
     }
     
+    // Métodos auxiliares para la construcción del PDF
     
-    
-    // Métodos auxiliares...Vista del PDF
     private void addInfoRow(PdfPTable table, String label, String value, Font labelFont) {
         PdfPCell labelCell = new PdfPCell(new Phrase(label, labelFont));
         labelCell.setBorder(Rectangle.NO_BORDER);
@@ -247,6 +298,9 @@ public class PdfGeneratorService {
         table.addCell(valueCell);
     }
     
+    /**
+     * Clase interna para manejar eventos de página (encabezado y pie de página)
+     */
     private class InvoicePageEventHandler extends PdfPageEventHelper {
         private Image logo;
         

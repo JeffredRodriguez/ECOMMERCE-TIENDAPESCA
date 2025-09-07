@@ -23,10 +23,9 @@ public class Product_Controller {
     
     /**
      * Obtiene una lista paginada de productos.
-     *
-     * @param page número de página (por defecto 0).
-     * @param size cantidad de elementos por página (por defecto 10).
-     * @return página de productos.
+     * @param page número de página (por defecto 0)
+     * @param size cantidad de elementos por página (por defecto 10)
+     * @return página de productos
      */
     @GetMapping("/get")
     public Page<Product> AllProducts(
@@ -37,12 +36,10 @@ public class Product_Controller {
         return productService.AllProducts(pageable);
     }
 
-    
     /**
      * Crea un nuevo producto en la base de datos.
-     *
-     * @param product objeto Product con los datos a registrar.
-     * @return el producto creado junto con el código HTTP 201 (CREATED).
+     * @param product objeto Product con los datos a registrar
+     * @return el producto creado con estado HTTP 201 (CREATED)
      */
     @PostMapping("/create")
     public ResponseEntity<Product> createProduct(@RequestBody Product product) {
@@ -50,13 +47,11 @@ public class Product_Controller {
         return new ResponseEntity<>(saved, HttpStatus.CREATED);
     }
 
-    
     /**
      * Actualiza un producto existente.
-     *
-     * @param id identificador del producto a actualizar.
-     * @param product objeto Product con los nuevos valores.
-     * @return el producto actualizado.
+     * @param id identificador del producto a actualizar
+     * @param product objeto Product con los nuevos valores
+     * @return el producto actualizado
      */
     @PutMapping("/update/{id}")
     public ResponseEntity<Product> updateProduct(
@@ -67,12 +62,10 @@ public class Product_Controller {
         return ResponseEntity.ok(updated);
     }
 
-    
     /**
      * Elimina un producto de la base de datos.
-     *
-     * @param id identificador del producto a eliminar.
-     * @return mensaje de confirmación o error si no se encuentra el producto.
+     * @param id identificador del producto a eliminar
+     * @return mensaje de confirmación o error si no se encuentra el producto
      */
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> eliminarProducto(@PathVariable int id) {

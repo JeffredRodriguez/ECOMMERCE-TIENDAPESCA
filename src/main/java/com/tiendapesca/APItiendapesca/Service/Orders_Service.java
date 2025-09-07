@@ -20,7 +20,6 @@ import com.tiendapesca.APItiendapesca.Entities.Invoice;
 import com.tiendapesca.APItiendapesca.Entities.OrderDetail;
 import com.tiendapesca.APItiendapesca.Entities.OrderStatus;
 import com.tiendapesca.APItiendapesca.Entities.Orders;
-import com.tiendapesca.APItiendapesca.Entities.PaymentMethod;
 import com.tiendapesca.APItiendapesca.Entities.Product;
 import com.tiendapesca.APItiendapesca.Entities.Users;
 import com.tiendapesca.APItiendapesca.Repository.OrderDetail_Repository;
@@ -28,6 +27,10 @@ import com.tiendapesca.APItiendapesca.Repository.Orders_Repository;
 import com.tiendapesca.APItiendapesca.Repository.Product_Repository;
 import com.tiendapesca.APItiendapesca.Repository.Users_Repository;
 
+/**
+ * Servicio para gestionar operaciones relacionadas con órdenes de compra
+ * Proporciona funcionalidades para crear, consultar y cancelar órdenes
+ */
 @Service
 public class Orders_Service {
 
@@ -38,6 +41,15 @@ public class Orders_Service {
     private final Users_Repository userRepository;
     private final Invoice_Service invoiceService;
 
+    /**
+     * Constructor para inyección de dependencias
+     * @param orderRepository Repositorio de órdenes
+     * @param orderDetailRepository Repositorio de detalles de órdenes
+     * @param cartService Servicio del carrito
+     * @param productRepository Repositorio de productos
+     * @param userRepository Repositorio de usuarios
+     * @param invoiceService Servicio de facturas
+     */
     @Autowired
     public Orders_Service(Orders_Repository orderRepository,
                        OrderDetail_Repository orderDetailRepository,
@@ -53,6 +65,12 @@ public class Orders_Service {
         this.invoiceService = invoiceService;
     }
 
+    /**
+     * Crea una nueva orden a partir del carrito de compras del usuario
+     * @param user Usuario autenticado
+     * @param orderRequest DTO con información de la orden
+     * @return DTO con la respuesta de la orden creada
+     */
     @Transactional
     public OrderResponseDTO createOrderFromCart(Users user, OrderRequestDTO orderRequest) {
         // Validar usuario
@@ -142,6 +160,11 @@ public class Orders_Service {
         return convertToOrderResponseDTO(savedOrder);
     }
 
+    /**
+     * Obtiene todas las órdenes de un usuario
+     * @param userId ID del usuario
+     * @return Lista de DTOs con las órdenes del usuario
+     */
     public List<OrderResponseDTO> getUserOrders(Integer userId) {
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
@@ -152,6 +175,12 @@ public class Orders_Service {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Obtiene los detalles de una orden específica
+     * @param orderId ID de la orden
+     * @param user Usuario autenticado
+     * @return DTO con los detalles de la orden
+     */
     public OrderResponseDTO getOrderDetails(Integer orderId, Users user) {
         Orders order = getOrderEntity(orderId);
 
@@ -163,12 +192,22 @@ public class Orders_Service {
         return convertToOrderResponseDTO(order);
     }
 
+    /**
+     * Obtiene la entidad Orders por ID
+     * @param orderId ID de la orden
+     * @return Entidad Orders
+     */
     public Orders getOrderEntity(Integer orderId) {
         return orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Orden no encontrada con ID: " + orderId));
     }
 
+    /**
+     * Convierte una entidad Orders a un DTO de respuesta
+     * @param order Orden a convertir
+     * @return DTO con la información de la orden
+     */
     private OrderResponseDTO convertToOrderResponseDTO(Orders order) {
         OrderResponseDTO responseDTO = new OrderResponseDTO();
         responseDTO.setOrderId(order.getId());
@@ -192,6 +231,11 @@ public class Orders_Service {
         return responseDTO;
     }
 
+    /**
+     * Convierte una entidad OrderDetail a un DTO
+     * @param orderDetail Detalle de orden a convertir
+     * @return DTO con la información del detalle
+     */
     private OrderDetailDTO convertToOrderDetailDTO(OrderDetail orderDetail) {
         OrderDetailDTO detailDTO = new OrderDetailDTO();
         detailDTO.setProductId(orderDetail.getProduct().getId());
@@ -204,6 +248,11 @@ public class Orders_Service {
         return detailDTO;
     }
 
+    /**
+     * Cancela una orden existente
+     * @param orderId ID de la orden a cancelar
+     * @param user Usuario autenticado
+     */
     @Transactional
     public void cancelOrder(Integer orderId, Users user) {
         Orders order = getOrderEntity(orderId);
@@ -237,6 +286,4 @@ public class Orders_Service {
             System.err.println("Error cancelando factura: " + e.getMessage());
         }
     }
-
-
 }
