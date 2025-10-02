@@ -14,7 +14,7 @@ import java.io.IOException;
 
 
 /**
- * Filtro JWT que intercepta cada solicitud HTTP para validar tokens JWT.
+ * Filtro JWT que intercepta cada solicitud HTTP para validar Tokens JWT.
  * Este filtro se ejecuta una vez por cada solicitud (OncePerRequestFilter) y:
  *   Extrae el token JWT del header Authorization
  *   Valida el token usando JWT_TokenUtil

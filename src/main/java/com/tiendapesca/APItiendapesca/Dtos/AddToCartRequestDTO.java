@@ -1,5 +1,6 @@
 package com.tiendapesca.APItiendapesca.Dtos;
 
+// Dto de carrito
 public class AddToCartRequestDTO {
     private Integer productId;
     private Integer quantity;

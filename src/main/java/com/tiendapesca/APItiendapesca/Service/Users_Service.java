@@ -19,7 +19,7 @@ public class Users_Service implements UserDetailsService {
     private final PasswordEncoder encoder;
 
     /**
-     * Constructor para inyección de dependencias
+     * Constructor para inyección de Dependencias
      * @param repo Repositorio de usuarios
      * @param encoder Codificador de contraseñas
      */

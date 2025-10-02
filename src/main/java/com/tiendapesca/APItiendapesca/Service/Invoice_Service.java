@@ -39,7 +39,7 @@ public class Invoice_Service {
      * Constructor para inyección de dependencias
      * @param invoiceRepository Repositorio de facturas
      * @param orderRepository Repositorio de órdenes
-     * @param pdfGeneratorService Servicio para generación de PDFs
+     * @param pdfGeneratorService Servicio para generación de PDF
      * @param emailService Servicio para envío de emails
      */
     @Autowired

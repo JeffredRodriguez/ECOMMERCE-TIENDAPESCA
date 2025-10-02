@@ -38,8 +38,7 @@ public class Cart_Controller {
      * Agrega productos al carrito de compras del usuario autenticado
      * @param user Usuario autenticado (inyectado automáticamente)
      * @param request DTO con los datos del producto a agregar
-     * @return ResponseEntity con estado 201 (CREATED)
-     */
+     * @return ResponseEntity con estado 201 
     @PostMapping("/add")
     public ResponseEntity<Void> addToCart(@AuthenticationPrincipal Users user,
                                         @Valid @RequestBody AddToCartRequestDTO request) {

@@ -27,7 +27,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     /**
-     * Método principal que carga un usuario por su nombre de usuario (email)
+     * Método principal que carga un usuario por su nombre de usuario (Email)
      * @param username El email que sirve como nombre de usuario
      * @return UserDetails con la información requerida por Spring Security
      * @throws UsernameNotFoundException Si el usuario no existe

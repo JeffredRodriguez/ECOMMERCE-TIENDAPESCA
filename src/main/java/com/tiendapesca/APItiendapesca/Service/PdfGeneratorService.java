@@ -115,7 +115,7 @@ public class PdfGeneratorService {
     /**
      * Agrega la información básica de la factura
      * @param document Documento PDF
-     * @param invoice Factura con la información
+     * @param invoice Factura con la Información
      * @throws DocumentException Si ocurre un error al agregar contenido
      */
     private void addInvoiceInfo(Document document, Invoice invoice) throws DocumentException {

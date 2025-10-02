@@ -73,7 +73,7 @@ public class Auth_Controller {
     /**
      * Manejador de excepciones para RuntimeExceptions
      * @param ex Excepción capturada
-     * @return ResponseEntity con mensaje de error y código HTTP 400
+     * @return ResponseEntity con mensaje de error
      */
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<String> handleException(RuntimeException ex) {

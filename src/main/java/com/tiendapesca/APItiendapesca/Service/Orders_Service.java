@@ -251,7 +251,7 @@ public class Orders_Service {
     /**
      * Cancela una orden existente
      * @param orderId ID de la orden a cancelar
-     * @param user Usuario autenticado
+     * @param user Usuario Autenticado
      */
     @Transactional
     public void cancelOrder(Integer orderId, Users user) {

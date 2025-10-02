@@ -26,7 +26,7 @@ public class JwtConfig {
     }
     
     /**
-     * Crea y configura la clave secreta para firmar tokens JWT
+     * Crea y configura la clave secreta para firmar Tokens JWT
      * @return SecretKey configurada a partir de la variable JWT_SECRET
      * @throws IllegalArgumentException si la clave secreta no está configurada o está vacía
      */

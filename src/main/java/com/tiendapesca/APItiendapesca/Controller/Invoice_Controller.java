@@ -24,7 +24,6 @@ public class Invoice_Controller {
 
     /**
      * Constructor para inyección de dependencias del servicio de facturas
-     * @param invoiceService Servicio para operaciones de facturación
      */
     @Autowired
     public Invoice_Controller(Invoice_Service invoiceService) {

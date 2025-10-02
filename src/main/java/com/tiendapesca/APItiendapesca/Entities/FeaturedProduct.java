@@ -1,6 +1,7 @@
 package com.tiendapesca.APItiendapesca.Entities;
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "featured_product")
@@ -63,4 +64,6 @@ public class FeaturedProduct {
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
+
+	
 }

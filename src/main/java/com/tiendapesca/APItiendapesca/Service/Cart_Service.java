@@ -76,7 +76,7 @@ public class Cart_Service {
     /**
      * Actualiza la cantidad de un item específico en el carrito
      * @param user Usuario dueño del carrito
-     * @param cartItemId ID del item del carrito
+     * @param cartItemId Id del item del carrito
      * @param quantity Nueva cantidad
      */
     public void updateCartItemQuantity(Users user, Integer cartItemId, Integer quantity) {

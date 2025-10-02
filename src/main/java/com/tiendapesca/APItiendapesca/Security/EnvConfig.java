@@ -32,7 +32,7 @@ public class EnvConfig {
     }
 
     /**
-     * Integra las variables del archivo .env con el entorno de Spring después de la construcción del bean
+     * Integra las variables del archivo .env con el entorno de Spring después de la construcción del Bean
      */
     @jakarta.annotation.PostConstruct
     public void init() {

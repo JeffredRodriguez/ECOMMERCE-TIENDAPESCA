@@ -30,8 +30,6 @@ public class Product {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "features")
-    private String features;
 
     @Column(name = "price")
     private BigDecimal price;
@@ -58,13 +56,12 @@ public class Product {
         super();
     }
 
-    public Product(int id, String brand, String name, String description, String features, BigDecimal price,
+    public Product(int id, String brand, String name, String description, BigDecimal price,
                    int stock, String image_url, Categorie categorie, LocalDateTime date) {
         this.id = id;
         this.brand = brand;
         this.name = name;
         this.description = description;
-        this.features = features;
         this.price = price;
         this.stock = stock;
         this.image_url = image_url;
@@ -104,14 +101,6 @@ public class Product {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getFeatures() {
-        return features;
-    }
-
-    public void setFeatures(String features) {
-        this.features = features;
     }
 
     public BigDecimal getPrice() {

@@ -24,7 +24,7 @@ public class Orders_Controller {
     private final Orders_Service ordersService;
 
     /**
-     * Constructor para inyección de dependencias del servicio de órdenes
+     * Constructor para inyección de dependencias del servicio de ordenes
      * @param ordersService Servicio para operaciones con órdenes
      */
     @Autowired

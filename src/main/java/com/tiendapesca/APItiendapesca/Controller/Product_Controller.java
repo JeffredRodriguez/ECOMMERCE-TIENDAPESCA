@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * Controlador REST para la gestión de productos en la tienda de pesca.
+ * Controlador REST para la gestión de productos.
  * Proporciona endpoints para operaciones CRUD y paginación de resultados.
  */
 @RestController
@@ -39,7 +39,7 @@ public class Product_Controller {
     /**
      * Crea un nuevo producto en la base de datos.
      * @param product objeto Product con los datos a registrar
-     * @return el producto creado con estado HTTP 201 (CREATED)
+     * @return el producto creado con estado HTTP 201 
      */
     @PostMapping("/create")
     public ResponseEntity<Product> createProduct(@RequestBody Product product) {

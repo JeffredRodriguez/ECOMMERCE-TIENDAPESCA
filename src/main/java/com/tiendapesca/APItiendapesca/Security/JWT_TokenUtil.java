@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 /**
- * Componente utilitario para la gestión de tokens JWT (JSON Web Tokens)
+ * Componente utilitario para la gestión de Tokens JWT (JSON Web Tokens)
  * Proporciona funcionalidades para generar, validar y extraer información de tokens JWT
  */
 @Component
