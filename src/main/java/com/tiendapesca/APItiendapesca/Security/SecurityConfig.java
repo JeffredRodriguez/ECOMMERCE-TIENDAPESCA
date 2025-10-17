@@ -36,6 +36,18 @@ public class SecurityConfig {
             .cors().configurationSource(corsConfigurationSource()).and()
             .csrf().disable()
             .authorizeHttpRequests(auth -> auth
+                // PERMITE ACCESO PÚBLICO A RECURSOS ESTÁTICOS
+                .requestMatchers(
+                    "/Imagenes/**",
+                    "/Cañas_BaitCasting/**",
+                    "/Cañas_Spinning/**", 
+                    "/Cañas%20Spinning/**",
+                    "/static/**",
+                    "/css/**",
+                    "/js/**",
+                    "/fonts/**",
+                    "/images/**"
+                ).permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/products/**").permitAll()
                 .requestMatchers("/api/cart/**").authenticated()
@@ -49,7 +61,6 @@ public class SecurityConfig {
         
         return http.build();
     }
-
     //Maneja solicitudes cruzadas para acceder desde diferentes origenes
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
