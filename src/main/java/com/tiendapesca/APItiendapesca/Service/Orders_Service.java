@@ -16,6 +16,7 @@ import com.tiendapesca.APItiendapesca.Dtos.CartItemRespoDTO;
 import com.tiendapesca.APItiendapesca.Dtos.OrderDetailDTO;
 import com.tiendapesca.APItiendapesca.Dtos.OrderRequestDTO;
 import com.tiendapesca.APItiendapesca.Dtos.OrderResponseDTO;
+import com.tiendapesca.APItiendapesca.Dtos.UserDTO;
 import com.tiendapesca.APItiendapesca.Entities.Invoice;
 import com.tiendapesca.APItiendapesca.Entities.OrderDetail;
 import com.tiendapesca.APItiendapesca.Entities.OrderStatus;
@@ -210,7 +211,8 @@ public class Orders_Service {
      */
     private OrderResponseDTO convertToOrderResponseDTO(Orders order) {
         OrderResponseDTO responseDTO = new OrderResponseDTO();
-        responseDTO.setOrderId(order.getId());
+        
+        responseDTO.setOrderId(order.getId());  // Ahora ambos son Integer
         responseDTO.setOrderDate(order.getDate());
         responseDTO.setShippingAddress(order.getShippingAddress());
         responseDTO.setPhone(order.getPhone());
@@ -219,6 +221,10 @@ public class Orders_Service {
         responseDTO.setTotal(order.getFinalTotal());
         responseDTO.setPaymentMethod(order.getPaymentMethod());
         responseDTO.setStatus(order.getStatus());
+
+        // Convertir usuario a UserDTO (sin datos sensibles)
+        UserDTO userDTO = convertToUserDTO(order.getUser());
+        responseDTO.setUser(userDTO);
 
         // Convertir detalles de la orden
         if (order.getOrderDetails() != null) {
@@ -231,6 +237,23 @@ public class Orders_Service {
         return responseDTO;
     }
 
+    /**
+     * Convierte una entidad Users a un UserDTO seguro (sin datos sensibles)
+     * @param user Usuario a convertir
+     * @return UserDTO con información segura
+     */
+    private UserDTO convertToUserDTO(Users user) {
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(user.getId());
+        userDTO.setName(user.getName());
+        userDTO.setEmail(user.getEmail());
+        userDTO.setRegistrationDate(user.getRegistrationDate());
+        // NO incluir: password, authorities, username, accountNonLocked, role, etc.
+        return userDTO;
+    }
+    
+    
+    
     /**
      * Convierte una entidad OrderDetail a un DTO
      * @param orderDetail Detalle de orden a convertir
@@ -285,5 +308,28 @@ public class Orders_Service {
         } catch (Exception e) {
             System.err.println("Error cancelando factura: " + e.getMessage());
         }
+    }
+
+    /**
+     * Obtiene todas las órdenes (para administradores)
+     * @return Lista de todas las órdenes
+     */
+    public List<OrderResponseDTO> getAllOrders() {
+        List<Orders> orders = orderRepository.findAll();
+        return orders.stream()
+                .map(this::convertToOrderResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Actualiza el estado de una orden (para administradores)
+     * @param orderId ID de la orden
+     * @param status Nuevo estado
+     */
+    @Transactional
+    public void updateOrderStatus(Integer orderId, OrderStatus status) {
+        Orders order = getOrderEntity(orderId);
+        order.setStatus(status);
+        orderRepository.save(order);
     }
 }

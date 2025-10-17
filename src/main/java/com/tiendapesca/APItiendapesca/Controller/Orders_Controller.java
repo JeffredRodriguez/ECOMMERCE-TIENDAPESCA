@@ -49,7 +49,7 @@ public class Orders_Controller {
     /**
      * Obtiene todas las órdenes del usuario autenticado
      * @param user Usuario autenticado
-     * @return Lista de DTOs con las órdenes del usuario
+     * @return Lista de DTOs con las órdenes del usuario (sin datos sensibles)
      */
     @GetMapping("/get")
     public ResponseEntity<List<OrderResponseDTO>> getUserOrders(
@@ -62,7 +62,7 @@ public class Orders_Controller {
      * Obtiene los detalles de una orden específica
      * @param user Usuario autenticado
      * @param orderId ID de la orden a consultar
-     * @return DTO con los detalles de la orden
+     * @return DTO con los detalles de la orden (sin datos sensibles del usuario)
      */
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderResponseDTO> getOrderDetails(
@@ -90,7 +90,7 @@ public class Orders_Controller {
      * Obtiene los detalles completos de una orden incluyendo sus items
      * @param user Usuario autenticado
      * @param orderId ID de la orden a consultar
-     * @return DTO con los detalles completos de la orden y sus items
+     * @return DTO con los detalles completos de la orden y sus items (sin datos sensibles)
      */
     @GetMapping("/{orderId}/items")
     public ResponseEntity<OrderResponseDTO> getOrderWithItems(
@@ -98,5 +98,36 @@ public class Orders_Controller {
             @PathVariable Integer orderId) {
         OrderResponseDTO order = ordersService.getOrderDetails(orderId, user);
         return ResponseEntity.ok(order);
+    }
+
+    /**
+     * Endpoint para administradores - Obtiene todas las órdenes del sistema
+     * @return Lista de todas las órdenes (sin datos sensibles de usuarios)
+     */
+    @GetMapping("/admin/all")
+    public ResponseEntity<List<OrderResponseDTO>> getAllOrders() {
+        List<OrderResponseDTO> orders = ordersService.getAllOrders();
+        return ResponseEntity.ok(orders);
+    }
+
+    /**
+     * Endpoint para administradores - Actualiza el estado de una orden
+     * @param orderId ID de la orden a actualizar
+     * @param status Nuevo estado de la orden
+     * @return ResponseEntity con estado HTTP 200
+     */
+    @PutMapping("/admin/{orderId}/status")
+    public ResponseEntity<Void> updateOrderStatus(
+            @PathVariable Integer orderId,
+            @RequestParam String status) {
+        // Convertir String a OrderStatus enum
+        try {
+            com.tiendapesca.APItiendapesca.Entities.OrderStatus orderStatus = 
+                com.tiendapesca.APItiendapesca.Entities.OrderStatus.valueOf(status.toUpperCase());
+            ordersService.updateOrderStatus(orderId, orderStatus);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

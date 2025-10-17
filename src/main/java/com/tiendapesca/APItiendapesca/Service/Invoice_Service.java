@@ -1,7 +1,9 @@
 package com.tiendapesca.APItiendapesca.Service;
 
+import com.tiendapesca.APItiendapesca.Dtos.InvoicePdfDTO;
 import com.tiendapesca.APItiendapesca.Dtos.InvoiceResponseDTO;
 import com.tiendapesca.APItiendapesca.Dtos.OrderDetailDTO;
+import com.tiendapesca.APItiendapesca.Dtos.ProductItemDTO;
 import com.tiendapesca.APItiendapesca.Entities.Invoice;
 import com.tiendapesca.APItiendapesca.Entities.Orders;
 import com.tiendapesca.APItiendapesca.Repository.Invoice_Repository;
@@ -92,18 +94,59 @@ public class Invoice_Service {
         invoice.setInvoiceNumber(invoiceNumber);
 
         try {
-            byte[] pdfBytes = pdfGeneratorService.generateInvoicePdf(invoice);
-            String pdfPath = pdfGeneratorService.savePdfToStorage(pdfBytes, invoiceNumber);
-            invoice.setPdfUrl(pdfPath);
-
+            // PRIMERO guardar la factura en la base de datos
             Invoice savedInvoice = invoiceRepository.save(invoice);
-            logger.info("Factura generada exitosamente con ID: {}", savedInvoice.getId());
-
-            return savedInvoice;
+            
+            // LUEGO generar el PDF usando el DTO seguro (sin recursión)
+            InvoicePdfDTO invoicePdfDTO = convertToInvoicePdfDTO(savedInvoice);
+            byte[] pdfBytes = pdfGeneratorService.generateInvoicePdf(invoicePdfDTO);
+            
+            // Guardar el PDF y actualizar la URL
+            String pdfPath = pdfGeneratorService.savePdfToStorage(pdfBytes, invoiceNumber);
+            savedInvoice.setPdfUrl(pdfPath);
+            
+            // Actualizar la factura con la URL del PDF
+            Invoice finalInvoice = invoiceRepository.save(savedInvoice);
+            
+            logger.info("Factura generada exitosamente con ID: {}", finalInvoice.getId());
+            return finalInvoice;
+            
         } catch (Exception e) {
             logger.error("Error al generar factura para orden ID: {}", orderId, e);
             throw new Exception("Error al generar la factura", e);
         }
+    }
+
+    /**
+     * Convierte una entidad Invoice a InvoicePdfDTO para generar PDF sin recursión
+     * @param invoice Factura a convertir
+     * @return DTO seguro para generación de PDF
+     */
+    private InvoicePdfDTO convertToInvoicePdfDTO(Invoice invoice) {
+        // Convertir los detalles del pedido a ProductItemDTO
+        List<ProductItemDTO> productItems = invoice.getOrder().getOrderDetails().stream()
+            .map(detail -> new ProductItemDTO(
+                detail.getProduct().getName(),
+                detail.getUnitPrice(),
+                detail.getQuantity(),
+                detail.getSubtotal(),
+                detail.getTax()
+            ))
+            .collect(Collectors.toList());
+
+        return new InvoicePdfDTO(
+            invoice.getInvoiceNumber(),
+            invoice.getDate(),
+            invoice.getOrder().getPaymentMethod().toString(),
+            invoice.getOrder().getUser().getName(),
+            invoice.getOrder().getUser().getEmail(),
+            invoice.getOrder().getShippingAddress(),
+            invoice.getOrder().getPhone(),
+            productItems,
+            invoice.getOrder().getTotalWithoutTax(),
+            invoice.getOrder().getTax(),
+            invoice.getOrder().getFinalTotal()
+        );
     }
 
     /**
@@ -221,5 +264,19 @@ public class Invoice_Service {
             invoice.getDate(),
             detailDTOs
         );
+    }
+
+    /**
+     * Método alternativo para obtener el PDF usando DTO seguro
+     * @param orderId ID de la orden
+     * @return Bytes del archivo PDF
+     * @throws Exception Si ocurre un error
+     */
+    public byte[] generateInvoicePdfSafe(Integer orderId) throws Exception {
+        logger.debug("Generando PDF seguro para orden ID: {}", orderId);
+
+        Invoice invoice = getInvoiceForOrder(orderId);
+        InvoicePdfDTO invoicePdfDTO = convertToInvoicePdfDTO(invoice);
+        return pdfGeneratorService.generateInvoicePdf(invoicePdfDTO);
     }
 }
